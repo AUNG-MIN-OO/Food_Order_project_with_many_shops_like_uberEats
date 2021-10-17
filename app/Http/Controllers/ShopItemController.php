@@ -3,10 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ShopItemRequest;
+use App\Http\Requests\ShopItemUpdateRequest;
 use App\Models\Shop;
 use App\Models\ShopItem;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Hash;
 
 class ShopItemController extends Controller
 {
@@ -17,7 +21,9 @@ class ShopItemController extends Controller
      */
     public function index()
     {
-        $shopItems = ShopItem::all();
+        $userId = Auth::user()->id;
+        $shop = Shop::where('user_id',$userId)->get();
+        $shopItems = ShopItem::where('shop_id',$shop[0]->id)->get();
         return view('admin.shop.item.index',compact('shopItems'));
     }
 
@@ -54,7 +60,7 @@ class ShopItemController extends Controller
         $shopItem->item_image = $newName;
         $shopItem->save();
 
-        return redirect()->route('shopItem.create')->with('toast','Items is added successfully');
+        return redirect()->route('shopItem.index')->with('toast','Items is added successfully');
     }
 
     /**
@@ -88,7 +94,30 @@ class ShopItemController extends Controller
      */
     public function update(Request $request, ShopItem $shopItem)
     {
-        //
+        $request->validate([
+            "name" => "required|string|min:3|max:256",
+            "price" => "required|integer|min:3",
+            "item_count" => "required|integer|min:1|max:100",
+        ]);
+        $shopItem->name = $request->name;
+        $shopItem->price = $request->price;
+        $shopItem->item_count = $request->item_count;
+
+        if ($request->file('item_image')){
+            $request->validate([
+                "item_image" => "required|mimes:jpg,jpeg,png"
+            ]);
+            $photo = $request->file('item_image');
+            $dir = "shop-item/";
+            $newName = uniqid()."shop_item.".$request->file('item_image')->getClientOriginalExtension();
+            File::delete(public_path($dir.$shopItem->item_image));
+            $photo->move($dir,$newName);
+
+            $shopItem->item_image = $newName;
+        }
+
+        $shopItem->update();
+        return redirect()->route('shopItem.index')->with("toast","Shop Item is updated");
     }
 
     /**
@@ -99,6 +128,7 @@ class ShopItemController extends Controller
      */
     public function destroy(ShopItem $shopItem)
     {
-        //
+        $shopItem->delete();
+        return redirect()->route('shopItem.index')->with("toast","Item has been deleted");
     }
 }
