@@ -24,7 +24,7 @@ class AdminController extends Controller
             $shop = Shop::where('user_id',$user->id)->first();
             return redirect()->route('shop.index',$shop->id);
         }else{
-            return redirect()->route('home');
+            return redirect()->route('user_home');
         }
     }
 

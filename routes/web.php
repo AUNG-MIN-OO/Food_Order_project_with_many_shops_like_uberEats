@@ -13,8 +13,17 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/', [\App\Http\Controllers\UserController::class,'index'])->name('user_home');
+Route::get('/restaurant-menu/{id}', [\App\Http\Controllers\UserController::class,'restaurantMenu']);
+Route::prefix('user')->middleware('auth')->group(function (){
+    Route::get('profile',[\App\Http\Controllers\UserController::class,'profile'])->name('user-profile');
+    Route::get('profile/address/{id}',[\App\Http\Controllers\UserController::class,'address'])->name('user-address');
+    Route::get('profile/address-edit/{id}',[\App\Http\Controllers\UserController::class,'addressEdit']);
+    Route::post('profile/address-update
+',[\App\Http\Controllers\UserController::class,'addressUpdate'])->name('addressUpdate');
+    //edit user profile info
+    Route::get('profile-edit/{id}',[\App\Http\Controllers\UserController::class,'profileEdit']);
+    Route::post('profile-update',[\App\Http\Controllers\UserController::class,'profileUpdate']);
 });
 
 Auth::routes();
