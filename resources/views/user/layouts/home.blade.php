@@ -7,7 +7,7 @@
                     <div class="row">
                         <div class="col-6 p-3 px-4 text-md-center">
                             <h5 class="text-nowrap">Find Everything <br>What <span class="text-primary">You Want</span></h5>
-                            <a href="restaurants.html" class="btn btn-primary radius text-capitalize">Order now</a>
+                            <a href="{{url('user/all-restaurant')}}" class="btn btn-primary radius text-capitalize">Order now</a>
                         </div>
                         <div class="col-6 text-md-center">
                             <img src="{{asset('food_order_project/assets/image/online_store.svg')}}" class="home_img" alt="">
@@ -27,9 +27,11 @@
             <div class="">
                 <div class="d-flex align-items-center">
                     @foreach($categories as $cat)
-                        <div class="category_card mr-3 text-center">
-                            <span class="text-nowrap">{{$cat->name}}</span>
-                        </div>
+                        <a href="{{url('user/category-search/'.$cat->id)}}" class="text-white text-decoration-none">
+                            <div class="category_card mr-3 text-center">
+                                <span class="text-nowrap">{{$cat->name}}</span>
+                            </div>
+                        </a>
                     @endforeach
                 </div>
             </div>
@@ -40,7 +42,7 @@
             <div class="col-12">
                 <div class="d-flex justify-content-between align-items-center restaurant_header">
                     <h5>Popular Restaurants</h5>
-                    <a href="restaurants.html" class="">
+                    <a href="{{url('user/all-restaurant')}}" class="">
                         View all
                         <span class="go_to_restaurant"><i class="feather-chevron-right"></i></span>
                     </a>

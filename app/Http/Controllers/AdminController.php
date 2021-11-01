@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\RegisterShop;
+use App\Models\Cart;
 use App\Models\Category;
 use App\Models\Shop;
 use App\Models\User;
@@ -17,12 +18,8 @@ class AdminController extends Controller
 {
 
     public function redirect(){
-        if (Auth::user()->role == 1){
+        if (Auth::user()->role == 1 || Auth::user()->role == 2){
             return redirect()->route('admin-home');
-        }elseif( Auth::user()->role == 2){
-            $user = Auth::user();
-            $shop = Shop::where('user_id',$user->id)->first();
-            return redirect()->route('shop.index',$shop->id);
         }else{
             return redirect()->route('user_home');
         }
@@ -111,5 +108,19 @@ class AdminController extends Controller
 
         $user->update();
         return redirect()->route('shop.index')->with("toast","Profile info is updated");
+    }
+
+    public function showOrder(){
+        $user_id = Auth::user()->id;
+        $shop = Shop::where('user_id',$user_id)->get();
+        $shopId = $shop[0]->id;
+        $orders = Cart::where('shop_id',$shopId)->get();
+        return view('admin.order.index',compact('orders'));
+    }
+
+    public function cancelOrder($id){
+        $order = Cart::find($id);
+        $order->delete();
+        return redirect()->back()->with("toast","Order has been cancelled!");
     }
 }

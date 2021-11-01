@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cart;
 use App\Models\Category;
+use App\Models\Favourite;
 use App\Models\Shop;
 use App\Models\ShopItem;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use RealRashid\SweetAlert\Facades\Alert;
@@ -23,7 +26,13 @@ class UserController extends Controller
         $user = User::find($id);
         $shop = Shop::where('user_id',$id)->get();
         $shopMenus = ShopItem::where('shop_id',$shop[0]->id)->get();
-        return view('user.restaurant_menu',compact('shopMenus','shop','user'));
+        if (\auth()->check()){
+            $authUserId = Auth::user()->id;
+            $favourite = Favourite::where(['user_id'=>$authUserId,'favourite_shop_id'=>$id])->get();
+        }else{
+            return redirect()->route('login');
+        }
+        return view('user.restaurant_menu',compact('shopMenus','shop','user','favourite'));
     }
 
     public function profile(){
@@ -88,5 +97,60 @@ class UserController extends Controller
         $user->update();
         Alert::success('Success', 'Your profile is successfully updated');
         return redirect()->route('user-profile');
+    }
+
+    public function orderList($id){
+        $orders = Cart::where('customer_id',$id)->orderBy('id','desc')->get();
+        return view('user.profile_order_list',compact('orders'));
+    }
+
+    public function orderDetail($id){
+        $order = Cart::where('id',$id)->get();
+        return view('user.profile_order_detail',compact('order'));
+    }
+
+    public function categorySearch($id){
+        $shop = Shop::with(['category','user'])->get()->where('shop_category',$id);
+        return view('user.all_restaurant',compact('shop'));
+    }
+
+    public function allRestaurant(){
+        $shop = Shop::all();
+        return view('user.all_restaurant',compact('shop'));
+    }
+
+    public function addToFavourite($id){
+        $authUser = Auth::user()->id;
+        if (!Favourite::where(['user_id'=>$authUser,'favourite_shop_id'=>$id])->exists()){
+            $favourite = new Favourite();
+            $favourite->user_id = Auth::user()->id;
+            $favourite->favourite_shop_id = $id;
+            $favourite->save();
+            toast('Added to favourite','success');
+            return redirect()->back();
+        }else{
+            toast('Already added to favourite','warning');
+            return redirect()->back();
+        }
+    }
+
+    public function removeFromFavourite($id){
+        $authUser = Auth::user()->id;
+        if (Favourite::where(['user_id'=>$authUser,'favourite_shop_id'=>$id])->exists()){
+            $favourite = Favourite::where(['user_id'=>$authUser,'favourite_shop_id'=>$id])->get();
+            $toDelete = Favourite::find($favourite[0]->id);
+            $toDelete->delete();
+            toast('Removed from favourite','warning');
+            return redirect()->back();
+        }else{
+            toast('This is not included in your favourite list','warning');
+            return redirect()->back();
+        }
+    }
+
+    public function favouriteShops(){
+        $authUser = Auth::user()->id;
+        $favouriteShops = Favourite::where('user_id',$authUser)->get();
+        return view('user.favourite_shops',compact('favouriteShops'));
     }
 }

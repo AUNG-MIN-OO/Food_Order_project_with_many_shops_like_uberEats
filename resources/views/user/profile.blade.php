@@ -53,7 +53,7 @@
                             <p>{{\Illuminate\Support\Facades\Auth::user()->email}}</p>
                         </div>
                         <div class="profile_body">
-                            <a href="#">
+                            <a href="{{url('user/order-list/'.\Illuminate\Support\Facades\Auth::user()->id)}}">
                                 <div class="d-flex justify-content-between align-items-center mt-2">
                                     <p class="mb-0 font-weight-bolder"><i class="feather-box mr-2"></i>My Orders</p>
                                     <span class="text-primary"><i class="feather-chevron-right" style="font-size: 25px"></i></span>

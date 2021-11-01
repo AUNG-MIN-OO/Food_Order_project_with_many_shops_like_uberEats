@@ -29,22 +29,14 @@
                     </li>
                     <div class="spacer"></div>
                     <div class="">
-                        <span class="fw-bold text-white-50 mb-0">Post Menu</span>
+                        <span class="fw-bold text-white-50 mb-0">Order Menu</span>
                         <div class="spacer"></div>
-                        <div class="menu-collect">
-                            <li class="d-flex justify-content-center align-items-center menu-item mb-2">
-                            <span>
-                                <i class="feather-plus-circle me-3"></i>
-                            </span>
-                                <a href="add_post.php" class="w-100 h5 text-white mb-0">Add Post</a>
-                            </li>
-                        </div>
                         <div class="menu-collect">
                             <li class="d-flex justify-content-center align-items-center menu-item mb-2">
                             <span>
                                 <i class="feather-list me-3"></i>
                             </span>
-                                <a href="post_list.php" class="w-100 h5 text-white mb-0">Posts List</a>
+                                <a href="{{route('admin-order.show')}}" class="w-100 h5 text-white mb-0">Order List</a>
                             </li>
                         </div>
                     </div>

@@ -15,6 +15,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [\App\Http\Controllers\UserController::class,'index'])->name('user_home');
 Route::get('/restaurant-menu/{id}', [\App\Http\Controllers\UserController::class,'restaurantMenu']);
+//search by category restaurant
+Route::get('user/category-search/{id}',[\App\Http\Controllers\UserController::class,'categorySearch']);
+Route::get('user/all-restaurant',[\App\Http\Controllers\UserController::class,'allRestaurant']);
 Route::prefix('user')->middleware('auth')->group(function (){
     Route::get('profile',[\App\Http\Controllers\UserController::class,'profile'])->name('user-profile');
     Route::get('profile/address/{id}',[\App\Http\Controllers\UserController::class,'address'])->name('user-address');
@@ -24,6 +27,21 @@ Route::prefix('user')->middleware('auth')->group(function (){
     //edit user profile info
     Route::get('profile-edit/{id}',[\App\Http\Controllers\UserController::class,'profileEdit']);
     Route::post('profile-update',[\App\Http\Controllers\UserController::class,'profileUpdate']);
+    Route::get('order-list/{id}',[\App\Http\Controllers\UserController::class,'orderList'])->name('user-order_list');
+    Route::get('order-detail/{id}',[\App\Http\Controllers\UserController::class,'orderDetail'])->name('user-order_detail');
+    //add to cart
+    Route::get('add-to-cart/{id}',[\App\Http\Controllers\CartController::class,'addToCart']);
+    Route::post('add-to-cart',[\App\Http\Controllers\CartController::class,'addItemToCart']);
+    Route::get('order-confirm',[\App\Http\Controllers\CartController::class,'orderConfirm']);
+    Route::get('order-delete/{id}',[\App\Http\Controllers\CartController::class,'orderDelete']);
+    Route::get('show-checkout',[\App\Http\Controllers\CartController::class,'checkOutPage'])->name('show_checkout');
+    Route::get('checkout',[\App\Http\Controllers\CartController::class,'checkOut']);
+    Route::get('order-success',[\App\Http\Controllers\CartController::class,'orderSuccess'])->name('order_success');
+    //add to favourite
+    Route::get('add-to-favourite/{id}',[\App\Http\Controllers\UserController::class,'addToFavourite']);
+    Route::get('remove-from-favourite/{id}',[\App\Http\Controllers\UserController::class,'removeFromFavourite']);
+    //favourite shop list
+    Route::get('favourite-shops',[\App\Http\Controllers\UserController::class,'favouriteShops']);
 });
 
 Auth::routes();
@@ -45,5 +63,9 @@ Route::prefix('admin')->group(function (){
         Route::put('update-profile/{id}',[App\Http\Controllers\AdminController::class, 'updateProfile'])->name('admin-profile.update');
         Route::resource('shop',\App\Http\Controllers\ShopController::class);
         Route::resource('shopItem',\App\Http\Controllers\ShopItemController::class);
+
+        //order
+        Route::get('show-order',[App\Http\Controllers\AdminController::class, 'showOrder'])->name('admin-order.show');
+        Route::get('cancel-order/{id}',[App\Http\Controllers\AdminController::class, 'cancelOrder'])->name('order_destroy');
     });
 });
